@@ -1,0 +1,47 @@
+name: Generate Stats Images
+
+on:
+  push:
+    branches: 
+      - master
+  schedule:
+    - cron: "5 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: mlugg/setup-zig@v2
+      with:
+        version: 0.15.2
+
+    # TODO: Cache build
+    - name: Build
+      run: |
+        echo TODO
+
+    - name: Generate images
+      run: |
+        echo TODO
+      env:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        EXCLUDED: ${{ secrets.EXCLUDED }}
+        EXCLUDED_LANGS: ${{ secrets.EXCLUDED_LANGS }}
+        EXCLUDE_FORKED_REPOS: true
+
+    # Commit all changed files to the repository
+    - name: Commit to the repo
+      run: |
+        git config --global user.name "jstrieb/github-stats"
+        git config --global user.email "github-stats[bot]@jstrieb.github.io"
+        git add .
+        # Force the build to succeed, even if no files were changed
+        git commit -m 'Update generated files' || true
+        git push
